@@ -37,9 +37,12 @@ fn hex_byte_to_nibble(hex_byte: u8) -> u8 {
     } else if hex_byte > 64 {
         // upper case letter
         hex_byte - 55
-    } else {
-        // digit
+    } else if hex_byte > 47 {
+        // digit or :;<=>?@
         hex_byte - 48
+    } else {
+        panic!("this program is apparently (?) only meant to deal with \
+                alphanumerics (and not, e.g., a space (' '), which underflows)");
     }
 }
 

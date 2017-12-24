@@ -32,13 +32,13 @@ fn main() {
 fn hex_byte_to_nibble(hex_byte: u8) -> u8 {
     if hex_byte > 96 {
         // lower case letter
-        return hex_byte - 87;
+        hex_byte - 87
     } else if hex_byte > 64 {
         // upper case letter
-        return hex_byte - 55;
+        hex_byte - 55
     } else {
         // digit
-        return hex_byte - 48;
+        hex_byte - 48
     }
 }
 

@@ -29,15 +29,6 @@ fn main() {
     }
 }
 
-fn test_main() {
-    let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    let mut out_buffer = [0; 4 * NUM_WINDOWS];
-    let mut b64_table = [0; 64];
-    assemble_b64_table(&mut b64_table);
-    print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, &b64_table);
-}
-
-
 fn hex_byte_to_nibble(hex_byte: u8) -> u8 {
     if hex_byte > 96 {
         // lower case letter
@@ -97,3 +88,18 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
     io::stdout().write(&out_buffer[0..(triplet_count * 4)]);
 }
 
+
+#[cfg(test)]
+mod tests { // run with `cargo test`
+    use super::{NUM_WINDOWS, assemble_b64_table, print_as_hex};
+
+    #[test]
+    fn test_main() {
+        let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let mut out_buffer = [0; 4 * NUM_WINDOWS];
+        let mut b64_table = [0; 64];
+        assemble_b64_table(&mut b64_table);
+        print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, &b64_table);
+    }
+
+}

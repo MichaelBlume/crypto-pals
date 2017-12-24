@@ -63,7 +63,7 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
         let index = i * 6;
         let mut x: u32 = 0;
         for offset in 0..6 {
-            x = x << 4;
+            x <<= 4;
             let next = index + offset;
             if next < l {
                 let nibble = hex_byte_to_nibble(in_buffer[next]) as u32;

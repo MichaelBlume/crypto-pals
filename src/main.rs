@@ -95,7 +95,7 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
 
 #[cfg(test)]
 mod tests { // run with `cargo test`
-    use super::{NUM_WINDOWS, assemble_b64_table, print_as_hex};
+    use super::{NUM_WINDOWS, assemble_b64_table, convert_to_hex, print_as_hex};
 
     #[test]
     fn test_main() {
@@ -103,7 +103,9 @@ mod tests { // run with `cargo test`
         let mut out_buffer = [0; 4 * NUM_WINDOWS];
         let mut b64_table = [0; 64];
         assemble_b64_table(&mut b64_table);
-        print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, &b64_table);
+        let result = convert_to_hex(s.len(), s.as_bytes(), &mut out_buffer, &b64_table);
+        assert_eq!(b"SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".to_vec(), // 'b'-prefixed byte literals are a thing
+                   result);
     }
 
 }

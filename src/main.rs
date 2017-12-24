@@ -17,7 +17,8 @@ fn main() {
                     } else {
                         l - 1
                     };
-                    print_as_hex(actual_l, &buffer, &mut out_buffer, &b64_table);
+                    print_as_hex(actual_l, &buffer, &mut out_buffer, &b64_table)
+                        .expect("should be able to print as hex");
                 }
                 if l == 6 * NUM_WINDOWS {
                     continue;
@@ -57,7 +58,7 @@ fn assemble_b64_table(table: &mut [u8]) {
     table[63] = '/' as u8;
 }
 
-fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) {
+fn convert_to_hex<'a>(l: usize, in_buffer: &[u8], out_buffer: &'a mut [u8], b64_table: &[u8]) -> &'a [u8] {
     let triplet_count = (l + 5) / 6;
     for i in 0..triplet_count {
         let index = i * 6;
@@ -85,9 +86,12 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
         }
 
     }
-    io::stdout().write(&out_buffer[0..(triplet_count * 4)]);
+    &out_buffer[0..(triplet_count * 4)]
 }
 
+fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) -> Result<usize, io::Error> {
+    io::stdout().write(convert_to_hex(l, in_buffer, out_buffer, b64_table))
+}
 
 #[cfg(test)]
 mod tests { // run with `cargo test`

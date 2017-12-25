@@ -2,11 +2,14 @@ use std::io::{self, Read, Write};
 
 const NUM_WINDOWS: usize = 128;
 
+fn b64_alphabet() -> &'static [u8] {
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".as_bytes()
+}
+
 fn main() {
     let mut buffer = [0; 6 * NUM_WINDOWS];
     let mut out_buffer = [0; 4 * NUM_WINDOWS];
-    let mut b64_table = [0; 64];
-    assemble_b64_table(&mut b64_table);
+    let b64_table = b64_alphabet();
 
     loop {
         match io::stdin().read(&mut buffer) {
@@ -31,9 +34,7 @@ fn main() {
 fn test_main() {
     let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
     let mut out_buffer = [0; 4 * NUM_WINDOWS];
-    let mut b64_table = [0; 64];
-    assemble_b64_table(&mut b64_table);
-    print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, &b64_table);
+    print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
 }
 
 
@@ -48,21 +49,6 @@ fn hex_byte_to_nibble(hex_byte: u8) -> u8 {
         // digit
         return hex_byte - 48;
     }
-}
-
-fn assemble_b64_table(table: &mut [u8]) {
-    for i in 0..26 {
-        table[i] = i as u8 + 'A' as u8;
-    }
-    for i in 0..26 {
-        table[i + 26] = i as u8 + 'a' as u8
-    }
-
-    for i in 0..10 {
-        table[i + 52] = i as u8 + '0' as u8;
-    }
-    table[62] = '+' as u8;
-    table[63] = '/' as u8;
 }
 
 fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) {

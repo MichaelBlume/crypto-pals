@@ -56,7 +56,7 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
             }
         }
     }
-    io::stdout().write(&out_buffer[0..(triplet_count * 4)]);
+    io::stdout().write(&out_buffer[0..(triplet_count * 4)]).expect("write to stdout");
     triplet_count * 4
 }
 

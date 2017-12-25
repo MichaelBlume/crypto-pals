@@ -52,7 +52,7 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
             if (l - index) / 2 >= sextet {
                 out_buffer[out_index] = b64_table[char_val as usize];
             } else {
-                out_buffer[out_index] = '=' as u8;
+                out_buffer[out_index] = b'=';
             }
         }
     }

@@ -20,7 +20,8 @@ fn main() {
                     } else {
                         l - 1
                     };
-                    print_as_hex(actual_l, &buffer, &mut out_buffer, &b64_table);
+                    let out_len = convert_to_hex(actual_l, &buffer, &mut out_buffer, &b64_table);
+                    io::stdout().write(&out_buffer[0..out_len]).expect("write to stdout");
                 }
                 if l != 6 * NUM_WINDOWS {
                     break;
@@ -31,7 +32,7 @@ fn main() {
     }
 }
 
-fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) -> usize {
+fn convert_to_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) -> usize {
     let triplet_count = (l + 5) / 6;
     for i in 0..triplet_count {
         let index = i * 6;
@@ -56,7 +57,6 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
             }
         }
     }
-    io::stdout().write(&out_buffer[0..(triplet_count * 4)]).expect("write to stdout");
     triplet_count * 4
 }
 
@@ -69,7 +69,7 @@ mod tests {
     fn test_main() {
         let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
         let mut out_buffer = [0; 4 * NUM_WINDOWS];
-        let out_size = print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
+        let out_size = convert_to_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
         assert_eq!(str::from_utf8(&out_buffer[0..out_size]).unwrap(), "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
     }
 }

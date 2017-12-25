@@ -54,16 +54,14 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
             let shift = (3 - sextet) * 6;
             let shifted = x >> shift;
             let char_val = shifted & 63;
-            let out_index = i * 4 + sextet ;
+            let out_index = i * 4 + sextet;
 
             if (l - index) / 2 >= sextet {
                 out_buffer[out_index] = b64_table[char_val as usize];
             } else {
                 out_buffer[out_index] = '=' as u8;
             }
-
         }
-
     }
     io::stdout().write(&out_buffer[0..(triplet_count * 4)]);
 }

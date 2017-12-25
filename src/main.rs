@@ -23,7 +23,7 @@ fn main() {
                     continue;
                 }
             }
-            Err(l) => println!("=( {}", l),
+            Err(l) => panic!("=( {}", l),
         }
         break;
     }

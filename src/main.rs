@@ -19,13 +19,12 @@ fn main() {
                     };
                     print_as_hex(actual_l, &buffer, &mut out_buffer, &b64_table);
                 }
-                if l == 6 * NUM_WINDOWS {
-                    continue;
+                if l != 6 * NUM_WINDOWS {
+                    break;
                 }
             }
             Err(l) => panic!("=( {}", l),
         }
-        break;
     }
 }
 

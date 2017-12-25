@@ -31,13 +31,6 @@ fn main() {
     }
 }
 
-fn test_main() {
-    let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    let mut out_buffer = [0; 4 * NUM_WINDOWS];
-    print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
-}
-
-
 fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) -> usize {
     let triplet_count = (l + 5) / 6;
     for i in 0..triplet_count {
@@ -67,3 +60,16 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
     triplet_count * 4
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str;
+
+    #[test]
+    fn test_main() {
+        let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+        let mut out_buffer = [0; 4 * NUM_WINDOWS];
+        let out_size = print_as_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
+        assert_eq!(str::from_utf8(&out_buffer[0..out_size]).unwrap(), "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
+    }
+}

@@ -38,19 +38,6 @@ fn test_main() {
 }
 
 
-fn hex_byte_to_nibble(hex_byte: u8) -> u8 {
-    if hex_byte > 96 {
-        // lower case letter
-        return hex_byte - 87;
-    } else if hex_byte > 64 {
-        // upper case letter
-        return hex_byte - 55;
-    } else {
-        // digit
-        return hex_byte - 48;
-    }
-}
-
 fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) {
     let triplet_count = (l + 5) / 6;
     for i in 0..triplet_count {
@@ -60,8 +47,7 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
             x = x << 4;
             let next = index + offset;
             if next < l {
-                let nibble = hex_byte_to_nibble(in_buffer[next]) as u32;
-                x += nibble;
+                x += (in_buffer[next] as char).to_digit(16).expect("Invalid hex char!");
             }
         }
         for sextet in 0..4 {

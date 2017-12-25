@@ -38,7 +38,7 @@ fn test_main() {
 }
 
 
-fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) {
+fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[u8]) -> usize {
     let triplet_count = (l + 5) / 6;
     for i in 0..triplet_count {
         let index = i * 6;
@@ -64,5 +64,6 @@ fn print_as_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: &[
         }
     }
     io::stdout().write(&out_buffer[0..(triplet_count * 4)]);
+    triplet_count * 4
 }
 

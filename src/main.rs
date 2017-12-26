@@ -66,7 +66,7 @@ mod tests {
     use std::str;
 
     #[test]
-    fn test_main() {
+    fn test_b64() {
         let s = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
         let mut out_buffer = [0; 4 * NUM_WINDOWS];
         let out_size = convert_to_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());

@@ -70,6 +70,75 @@ fn xor_buffers(s1: &[u8], s2: &[u8], out_buffer: &mut [u8]) {
     }
 }
 
+fn hex_byte_to_nibble(b: u8) -> u8 {
+    (b as char).to_digit(16).expect("hex") as u8
+}
+
+fn hex_to_bytestring(s: &[u8]) -> Vec<u8> {
+    let ret_len = s.len() / 2;
+    let mut ret = Vec::with_capacity(ret_len);
+    for i in 0..ret_len {
+        ret.push(hex_byte_to_nibble(s[i * 2]) * 16 + hex_byte_to_nibble(s[i * 2 + 1]));
+    }
+    ret
+}
+
+fn create_scoring_table() -> [u8; 256] {
+    let mut ret = [0; 256];
+
+    ret[b' ' as usize] = 167;
+
+    let u = |ret: &mut [u8], c: u8, score: u8| {
+        ret[c as usize] = score;
+        ret[(c + b'A' - b'a') as usize] = score;
+    };
+
+    u(&mut ret, b'e', 127);
+    u(&mut ret, b't', 91);
+    u(&mut ret, b'a', 82);
+    u(&mut ret, b'o', 76);
+    u(&mut ret, b'i', 70);
+    u(&mut ret, b'n', 67);
+    u(&mut ret, b's', 63);
+    u(&mut ret, b'h', 61);
+    u(&mut ret, b'r', 60);
+    u(&mut ret, b'd', 43);
+    u(&mut ret, b'l', 40);
+    u(&mut ret, b'c', 28);
+    u(&mut ret, b'u', 28);
+
+    ret
+}
+
+fn decode_hex_cipher(s: &[u8]) -> Vec<u8> {
+    let mut cipher_string = hex_to_bytestring(s);
+    let ret_len = cipher_string.len();
+    let mut best_score = 0;
+    let mut best_key = 0;
+    let score_table = create_scoring_table();
+    let mut key = 0;
+    loop {
+        let mut new_score = 0;
+        for i in 0..ret_len {
+            let char_ind = (cipher_string[i] ^ key) as usize;
+            let char_score = score_table[char_ind] as i32;
+            new_score += char_score;
+        }
+        if new_score > best_score {
+            best_key = key;
+            best_score = new_score;
+        }
+        if key == 255 {
+            break;
+        }
+        key += 1;
+    }
+    for i in 0..ret_len {
+        cipher_string[i] ^= best_key
+    }
+    cipher_string
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,5 +160,11 @@ mod tests {
         let mut out_buffer = [0; 50];
         xor_buffers(s1.as_bytes(), s2.as_bytes(), &mut out_buffer);
         assert_eq!(str::from_utf8(&out_buffer[0..s1.len()]).unwrap(), expected);
+    }
+
+    #[test]
+    fn test_decode_single_byte() {
+        let result = decode_hex_cipher("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".as_bytes());
+        assert_eq!("Cooking MC's like a pound of bacon", str::from_utf8(&result).expect("utf8"));
     }
 }

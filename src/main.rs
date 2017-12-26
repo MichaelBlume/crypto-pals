@@ -1,4 +1,5 @@
 use std::io::{self, Read, Write};
+use std::char;
 
 const NUM_WINDOWS: usize = 128;
 
@@ -60,6 +61,15 @@ fn convert_to_hex(l: usize, in_buffer: &[u8], out_buffer: &mut [u8], b64_table: 
     triplet_count * 4
 }
 
+fn xor_buffers(s1: &[u8], s2: &[u8], out_buffer: &mut [u8]) {
+    for i in 0..s1.len() {
+        let nibble1 = (s1[i] as char).to_digit(16).expect("hex");
+        let nibble2 = (s2[i] as char).to_digit(16).expect("hex2");
+        let nibble_result = nibble1 ^ nibble2;
+        out_buffer[i] = char::from_digit(nibble_result, 16).expect("should be hex") as u8;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -71,5 +81,15 @@ mod tests {
         let mut out_buffer = [0; 4 * NUM_WINDOWS];
         let out_size = convert_to_hex(s.len(), s.as_bytes(), &mut out_buffer, b64_alphabet());
         assert_eq!(str::from_utf8(&out_buffer[0..out_size]).unwrap(), "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
+    }
+
+    #[test]
+    fn test_xor() {
+        let s1 = "1c0111001f010100061a024b53535009181c";
+        let s2 = "686974207468652062756c6c277320657965";
+        let expected = "746865206b696420646f6e277420706c6179";
+        let mut out_buffer = [0; 50];
+        xor_buffers(s1.as_bytes(), s2.as_bytes(), &mut out_buffer);
+        assert_eq!(str::from_utf8(&out_buffer[0..s1.len()]).unwrap(), expected);
     }
 }

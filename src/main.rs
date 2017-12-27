@@ -110,20 +110,31 @@ fn create_scoring_table() -> [u8; 256] {
     ret
 }
 
+fn score_string_with_key(cipher_string: &Vec<u8>, key: u8, score_table: &[u8]) -> i32 {
+    let mut new_score = 0;
+    for i in 0..cipher_string.len() {
+        let char_ind = (cipher_string[i] ^ key) as usize;
+        let char_score = score_table[char_ind] as i32;
+        new_score += char_score;
+    }
+    new_score
+}
+
+fn decode_string_with_key(cipher_string: &mut Vec<u8>, key: u8) {
+    for i in 0..cipher_string.len() {
+        cipher_string[i] ^= key
+    }
+
+}
+
 fn decode_hex_cipher(s: &[u8]) -> Vec<u8> {
     let mut cipher_string = hex_to_bytestring(s);
-    let ret_len = cipher_string.len();
     let mut best_score = 0;
     let mut best_key = 0;
     let score_table = create_scoring_table();
     let mut key = 0;
     loop {
-        let mut new_score = 0;
-        for i in 0..ret_len {
-            let char_ind = (cipher_string[i] ^ key) as usize;
-            let char_score = score_table[char_ind] as i32;
-            new_score += char_score;
-        }
+        let new_score = score_string_with_key(&cipher_string, key, &score_table);
         if new_score > best_score {
             best_key = key;
             best_score = new_score;
@@ -133,9 +144,7 @@ fn decode_hex_cipher(s: &[u8]) -> Vec<u8> {
         }
         key += 1;
     }
-    for i in 0..ret_len {
-        cipher_string[i] ^= best_key
-    }
+    decode_string_with_key(&mut cipher_string, best_key);
     cipher_string
 }
 
